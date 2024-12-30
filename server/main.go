@@ -4,8 +4,7 @@ import (
 	"context"
 	"github.com/cyber-xxm/gin-vue-admin/internal/initialize"
 	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/config"
-	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/db"
-	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/db/orm"
+	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/orm"
 	models "github.com/cyber-xxm/gin-vue-admin/internal/models/config"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/db/example"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/db/system"
@@ -41,21 +40,24 @@ func main() {
 	viper, cfg := config.Viper()
 	ctx = context.WithValue(ctx, "config", cfg)
 	ctx = context.WithValue(ctx, "viper", viper)
-	db.OtherInit(ctx)
+	initialize.OtherInit(ctx)
 	logger := zap_logger.Zap(cfg.Zap.Director, cfg.Zap.Levels(), cfg.Zap.ShowLine)
 	zap_logger.NewZapLogger(logger) // 初始化zap日志库
 	zap.ReplaceGlobals(logger)
 	ormDb := Gorm(cfg.System.DbType, cfg) // gorm连接数据库
 	ctx = context.WithValue(ctx, "db", ormDb)
 	initialize.Timer(ormDb)
-	db.DBList(cfg.DBList)
+	initialize.DBList(cfg.DBList)
 	if ormDb != nil {
-		initialize.RegisterTables() // 初始化表
+		RegisterTables(ormDb) // 初始化表
 		// 程序结束前关闭数据库链接
 		db, _ := ormDb.DB()
 		defer db.Close()
 	}
-	web.RunWindowsServer()
+	err := web.RunWindowsServer(ctx)
+	if err != nil {
+		logger.Error(err.Error())
+	}
 }
 
 func Gorm(dbType string, cfg models.Server) *gorm.DB {
@@ -77,7 +79,6 @@ func Gorm(dbType string, cfg models.Server) *gorm.DB {
 
 func RegisterTables(db *gorm.DB) {
 	err := db.AutoMigrate(
-
 		system.SysApi{},
 		system.SysIgnoreApi{},
 		system.SysUser{},

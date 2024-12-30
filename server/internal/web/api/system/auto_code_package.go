@@ -1,11 +1,11 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -15,12 +15,12 @@ import (
 
 func NewAutoCodePackageApi(db *gorm.DB) *AutoCodePackageApi {
 	return &AutoCodePackageApi{
-		autoCodePackageService: service.NewAutoCodePackageService(db),
+		AutoCodePackageService: service.NewAutoCodePackageService(db),
 	}
 }
 
 type AutoCodePackageApi struct {
-	autoCodePackageService *service.AutoCodePackageService
+	AutoCodePackageService *service.AutoCodePackageService
 }
 
 // Create
@@ -43,7 +43,7 @@ func (a *AutoCodePackageApi) Create(c *gin.Context) {
 		response.FailWithMessage("包名不合法", c)
 		return
 	} // PackageName可能导致路径穿越的问题 / 和 \ 都要防止
-	err := a.autoCodePackageService.Create(c.Request.Context(), &info)
+	err := a.AutoCodePackageService.Create(c.Request.Context(), &info)
 	if err != nil {
 		zap_logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
@@ -64,7 +64,7 @@ func (a *AutoCodePackageApi) Create(c *gin.Context) {
 func (a *AutoCodePackageApi) Delete(c *gin.Context) {
 	var info request.GetById
 	_ = c.ShouldBindJSON(&info)
-	err := a.autoCodePackageService.Delete(c.Request.Context(), info)
+	err := a.AutoCodePackageService.Delete(c.Request.Context(), info)
 	if err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -82,7 +82,7 @@ func (a *AutoCodePackageApi) Delete(c *gin.Context) {
 // @Success   200  {object}  response.Response{data=map[string]interface{},msg=string}  "创建package成功"
 // @Router    /autoCode/getPackage [post]
 func (a *AutoCodePackageApi) All(c *gin.Context) {
-	data, err := a.autoCodePackageService.All(c.Request.Context())
+	data, err := a.AutoCodePackageService.All(c.Request.Context())
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
@@ -100,7 +100,7 @@ func (a *AutoCodePackageApi) All(c *gin.Context) {
 // @Success   200  {object}  response.Response{data=map[string]interface{},msg=string}  "创建package成功"
 // @Router    /autoCode/getTemplates [get]
 func (a *AutoCodePackageApi) Templates(c *gin.Context) {
-	data, err := a.autoCodePackageService.Templates(c.Request.Context())
+	data, err := a.AutoCodePackageService.Templates(c.Request.Context())
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

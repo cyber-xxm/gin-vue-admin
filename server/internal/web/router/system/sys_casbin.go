@@ -1,19 +1,29 @@
 package system
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/web/core/middleware"
+	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 )
 
-type CasbinRouter struct{}
+func NewCasbinRouter(casbinApi *system.CasbinApi) *CasbinRouter {
+	return &CasbinRouter{
+		casbinApi: casbinApi,
+	}
+}
 
-func (s *CasbinRouter) InitCasbinRouter(Router *gin.RouterGroup) {
-	casbinRouter := Router.Group("casbin").Use(middleware.OperationRecord())
-	casbinRouterWithoutRecord := Router.Group("casbin")
+type CasbinRouter struct {
+	casbinApi *system.CasbinApi
+}
+
+func (r *CasbinRouter) InitCasbinRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
+	casbinRouter := router.Group("casbin").Use(middleware.OperationRecord(recordService))
+	casbinRouterWithoutRecord := router.Group("casbin")
 	{
-		casbinRouter.POST("updateCasbin", casbinApi.UpdateCasbin)
+		casbinRouter.POST("updateCasbin", r.casbinApi.UpdateCasbin)
 	}
 	{
-		casbinRouterWithoutRecord.POST("getPolicyPathByAuthorityId", casbinApi.GetPolicyPathByAuthorityId)
+		casbinRouterWithoutRecord.POST("getPolicyPathByAuthorityId", r.casbinApi.GetPolicyPathByAuthorityId)
 	}
 }

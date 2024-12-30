@@ -6,6 +6,7 @@ import (
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	systemRes "github.com/cyber-xxm/gin-vue-admin/internal/models/response/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"gorm.io/gorm"
 
@@ -15,12 +16,12 @@ import (
 
 func NewAuthorityApi(db *gorm.DB) *AuthorityApi {
 	return &AuthorityApi{
-		authorityService: service.NewAuthorityService(db),
+		AuthorityService: service.NewAuthorityService(db),
 	}
 }
 
 type AuthorityApi struct {
-	authorityService *service.AuthorityService
+	AuthorityService *service.AuthorityService
 }
 
 // CreateAuthority
@@ -50,7 +51,7 @@ func (a *AuthorityApi) CreateAuthority(c *gin.Context) {
 		authority.ParentId = utils.Pointer(utils.GetUserAuthorityId(c))
 	}
 
-	if authBack, err = a.authorityService.CreateAuthority(authority); err != nil {
+	if authBack, err = a.AuthorityService.CreateAuthority(authority); err != nil {
 		zap_logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败"+err.Error(), c)
 		return
@@ -91,7 +92,7 @@ func (a *AuthorityApi) CopyAuthority(c *gin.Context) {
 		return
 	}
 	adminAuthorityID := utils.GetUserAuthorityId(c)
-	authBack, err := a.authorityService.CopyAuthority(adminAuthorityID, copyInfo)
+	authBack, err := a.AuthorityService.CopyAuthority(adminAuthorityID, copyInfo)
 	if err != nil {
 		zap_logger.Error("拷贝失败!", zap.Error(err))
 		response.FailWithMessage("拷贝失败"+err.Error(), c)
@@ -121,7 +122,7 @@ func (a *AuthorityApi) DeleteAuthority(c *gin.Context) {
 		return
 	}
 	// 删除角色之前需要判断是否有用户正在使用此角色
-	if err = a.authorityService.DeleteAuthority(&authority); err != nil {
+	if err = a.AuthorityService.DeleteAuthority(&authority); err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败"+err.Error(), c)
 		return
@@ -151,7 +152,7 @@ func (a *AuthorityApi) UpdateAuthority(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	authority, err := a.authorityService.UpdateAuthority(auth)
+	authority, err := a.AuthorityService.UpdateAuthority(auth)
 	if err != nil {
 		zap_logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败"+err.Error(), c)
@@ -171,7 +172,7 @@ func (a *AuthorityApi) UpdateAuthority(c *gin.Context) {
 // @Router    /authority/getAuthorityList [post]
 func (a *AuthorityApi) GetAuthorityList(c *gin.Context) {
 	authorityID := utils.GetUserAuthorityId(c)
-	list, err := a.authorityService.GetAuthorityInfoList(authorityID)
+	list, err := a.AuthorityService.GetAuthorityInfoList(authorityID)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败"+err.Error(), c)
@@ -202,7 +203,7 @@ func (a *AuthorityApi) SetDataAuthority(c *gin.Context) {
 		return
 	}
 	adminAuthorityID := utils.GetUserAuthorityId(c)
-	err = a.authorityService.SetDataAuthority(adminAuthorityID, auth)
+	err = a.AuthorityService.SetDataAuthority(adminAuthorityID, auth)
 	if err != nil {
 		zap_logger.Error("设置失败!", zap.Error(err))
 		response.FailWithMessage("设置失败"+err.Error(), c)

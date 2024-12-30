@@ -1,14 +1,23 @@
 package system
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
 	"github.com/gin-gonic/gin"
 )
 
-type JwtRouter struct{}
+func NewJwtRouter(jwtApi *system.JwtApi) *JwtRouter {
+	return &JwtRouter{
+		jwtApi: jwtApi,
+	}
+}
 
-func (s *JwtRouter) InitJwtRouter(Router *gin.RouterGroup) {
-	jwtRouter := Router.Group("jwt")
+type JwtRouter struct {
+	jwtApi *system.JwtApi
+}
+
+func (r *JwtRouter) InitJwtRouter(router *gin.RouterGroup) {
+	jwtRouter := router.Group("jwt")
 	{
-		jwtRouter.POST("jsonInBlacklist", jwtApi.JsonInBlacklist) // jwt加入黑名单
+		jwtRouter.POST("jsonInBlacklist", r.jwtApi.JsonInBlacklist) // jwt加入黑名单
 	}
 }

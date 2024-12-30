@@ -1,11 +1,11 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/db/system"
 	system2 "github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -14,12 +14,12 @@ import (
 
 func NewDictionaryDetailApi(db *gorm.DB) *DictionaryDetailApi {
 	return &DictionaryDetailApi{
-		dictionaryDetailService: service.NewDictionaryDetailService(db),
+		DictionaryDetailService: service.NewDictionaryDetailService(db),
 	}
 }
 
 type DictionaryDetailApi struct {
-	dictionaryDetailService *service.DictionaryDetailService
+	DictionaryDetailService *service.DictionaryDetailService
 }
 
 // CreateSysDictionaryDetail
@@ -38,7 +38,7 @@ func (a *DictionaryDetailApi) CreateSysDictionaryDetail(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.dictionaryDetailService.CreateSysDictionaryDetail(detail)
+	err = a.DictionaryDetailService.CreateSysDictionaryDetail(detail)
 	if err != nil {
 		zap_logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
@@ -63,7 +63,7 @@ func (a *DictionaryDetailApi) DeleteSysDictionaryDetail(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.dictionaryDetailService.DeleteSysDictionaryDetail(detail)
+	err = a.DictionaryDetailService.DeleteSysDictionaryDetail(detail)
 	if err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -88,7 +88,7 @@ func (a *DictionaryDetailApi) UpdateSysDictionaryDetail(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.dictionaryDetailService.UpdateSysDictionaryDetail(&detail)
+	err = a.DictionaryDetailService.UpdateSysDictionaryDetail(&detail)
 	if err != nil {
 		zap_logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -118,7 +118,7 @@ func (a *DictionaryDetailApi) FindSysDictionaryDetail(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	reSysDictionaryDetail, err := a.dictionaryDetailService.GetSysDictionaryDetail(detail.ID)
+	reSysDictionaryDetail, err := a.DictionaryDetailService.GetSysDictionaryDetail(detail.ID)
 	if err != nil {
 		zap_logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -143,7 +143,7 @@ func (a *DictionaryDetailApi) GetSysDictionaryDetailList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := a.dictionaryDetailService.GetSysDictionaryDetailInfoList(pageInfo)
+	list, total, err := a.DictionaryDetailService.GetSysDictionaryDetailInfoList(pageInfo)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

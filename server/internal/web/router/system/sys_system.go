@@ -1,22 +1,32 @@
 package system
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/web/core/middleware"
+	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 )
 
-type SysRouter struct{}
+func NewConfigRouter(configApi *system.ConfigApi) *ConfigRouter {
+	return &ConfigRouter{
+		configApi: configApi,
+	}
+}
 
-func (s *SysRouter) InitSystemRouter(Router *gin.RouterGroup) {
-	sysRouter := Router.Group("system").Use(middleware.OperationRecord())
-	sysRouterWithoutRecord := Router.Group("system")
+type ConfigRouter struct {
+	configApi *system.ConfigApi
+}
+
+func (r *ConfigRouter) InitSystemRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
+	sysRouter := router.Group("system").Use(middleware.OperationRecord(recordService))
+	sysRouterWithoutRecord := router.Group("system")
 
 	{
-		sysRouter.POST("setSystemConfig", systemApi.SetSystemConfig) // 设置配置文件内容
-		sysRouter.POST("reloadSystem", systemApi.ReloadSystem)       // 重启服务
+		sysRouter.POST("setSystemConfig", r.configApi.SetSystemConfig) // 设置配置文件内容
+		sysRouter.POST("reloadSystem", r.configApi.ReloadSystem)       // 重启服务
 	}
 	{
-		sysRouterWithoutRecord.POST("getSystemConfig", systemApi.GetSystemConfig) // 获取配置文件内容
-		sysRouterWithoutRecord.POST("getServerInfo", systemApi.GetServerInfo)     // 获取服务器信息
+		sysRouterWithoutRecord.POST("getSystemConfig", r.configApi.GetSystemConfig) // 获取配置文件内容
+		sysRouterWithoutRecord.POST("getServerInfo", r.configApi.GetServerInfo)     // 获取服务器信息
 	}
 }

@@ -7,26 +7,24 @@ import (
 	system2 "github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
-	"github.com/cyber-xxm/gin-vue-admin/internal/utils/plugin/email/service"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
+	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"gorm.io/gorm"
 	"net/http"
 
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 func NewSysExportTemplateApi(db *gorm.DB) *SysExportTemplateApi {
 	return &SysExportTemplateApi{
-		sysExportTemplateService: service.NewSysExportTemplateService(db),
+		SysExportTemplateService: service.NewSysExportTemplateService(db),
 	}
 }
 
 type SysExportTemplateApi struct {
-	sysExportTemplateService *service.SysExportTemplateService
+	SysExportTemplateService *service.SysExportTemplateService
 }
-
-var sysExportTemplateService = service.ServiceGroupApp.SystemServiceGroup.SysExportTemplateService
 
 // CreateSysExportTemplate 创建导出模板
 // @Tags SysExportTemplate
@@ -51,7 +49,7 @@ func (a *SysExportTemplateApi) CreateSysExportTemplate(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err := a.sysExportTemplateService.CreateSysExportTemplate(&sysExportTemplate); err != nil {
+	if err := a.SysExportTemplateService.CreateSysExportTemplate(&sysExportTemplate); err != nil {
 		zap_logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
@@ -75,7 +73,7 @@ func (a *SysExportTemplateApi) DeleteSysExportTemplate(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err := a.sysExportTemplateService.DeleteSysExportTemplate(sysExportTemplate); err != nil {
+	if err := a.SysExportTemplateService.DeleteSysExportTemplate(sysExportTemplate); err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
@@ -99,7 +97,7 @@ func (a *SysExportTemplateApi) DeleteSysExportTemplateByIds(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err := a.sysExportTemplateService.DeleteSysExportTemplateByIds(IDS); err != nil {
+	if err := a.SysExportTemplateService.DeleteSysExportTemplateByIds(IDS); err != nil {
 		zap_logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
@@ -130,7 +128,7 @@ func (a *SysExportTemplateApi) UpdateSysExportTemplate(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err := a.sysExportTemplateService.UpdateSysExportTemplate(sysExportTemplate); err != nil {
+	if err := a.SysExportTemplateService.UpdateSysExportTemplate(sysExportTemplate); err != nil {
 		zap_logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
@@ -154,7 +152,7 @@ func (a *SysExportTemplateApi) FindSysExportTemplate(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if resysExportTemplate, err := a.sysExportTemplateService.GetSysExportTemplate(sysExportTemplate.ID); err != nil {
+	if resysExportTemplate, err := a.SysExportTemplateService.GetSysExportTemplate(sysExportTemplate.ID); err != nil {
 		zap_logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
@@ -178,7 +176,7 @@ func (a *SysExportTemplateApi) GetSysExportTemplateList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if list, total, err := a.sysExportTemplateService.GetSysExportTemplateInfoList(pageInfo); err != nil {
+	if list, total, err := a.SysExportTemplateService.GetSysExportTemplateInfoList(pageInfo); err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
@@ -205,7 +203,7 @@ func (a *SysExportTemplateApi) ExportExcel(c *gin.Context) {
 		response.FailWithMessage("模板ID不能为空", c)
 		return
 	}
-	if file, name, err := a.sysExportTemplateService.ExportExcel(templateID, queryParams); err != nil {
+	if file, name, err := a.SysExportTemplateService.ExportExcel(templateID, queryParams); err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
@@ -228,7 +226,7 @@ func (a *SysExportTemplateApi) ExportTemplate(c *gin.Context) {
 		response.FailWithMessage("模板ID不能为空", c)
 		return
 	}
-	if file, name, err := a.sysExportTemplateService.ExportTemplate(templateID); err != nil {
+	if file, name, err := a.SysExportTemplateService.ExportTemplate(templateID); err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
@@ -257,7 +255,7 @@ func (a *SysExportTemplateApi) ImportExcel(c *gin.Context) {
 		response.FailWithMessage("文件获取失败", c)
 		return
 	}
-	if err := a.sysExportTemplateService.ImportExcel(templateID, file); err != nil {
+	if err := a.SysExportTemplateService.ImportExcel(templateID, file); err != nil {
 		zap_logger.Error(err.Error(), zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
 	} else {

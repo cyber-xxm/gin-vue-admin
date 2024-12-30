@@ -1,16 +1,25 @@
 package system
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
 	"github.com/gin-gonic/gin"
 )
 
-type BaseRouter struct{}
+func NewBaseRouter(baseApi *system.BaseApi) *BaseRouter {
+	return &BaseRouter{
+		baseApi: baseApi,
+	}
+}
 
-func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
-	baseRouter := Router.Group("base")
+type BaseRouter struct {
+	baseApi *system.BaseApi
+}
+
+func (r *BaseRouter) InitBaseRouter(router *gin.RouterGroup) (R gin.IRoutes) {
+	baseRouter := router.Group("base")
 	{
-		baseRouter.POST("login", baseApi.Login)
-		baseRouter.POST("captcha", baseApi.Captcha)
+		baseRouter.POST("login", r.baseApi.Login)
+		baseRouter.POST("captcha", r.baseApi.Captcha)
 	}
 	return baseRouter
 }

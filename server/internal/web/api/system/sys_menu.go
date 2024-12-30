@@ -1,13 +1,13 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/db/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request"
 	system2 "github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	systemRes "github.com/cyber-xxm/gin-vue-admin/internal/models/response/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"gorm.io/gorm"
 
@@ -17,14 +17,14 @@ import (
 
 func NewMenuApi(db *gorm.DB) *MenuApi {
 	return &MenuApi{
-		menuService:     service.NewMenuService(db),
-		baseMenuService: service.NewBaseMenuService(db),
+		MenuService:     service.NewMenuService(db),
+		BaseMenuService: service.NewBaseMenuService(db),
 	}
 }
 
 type MenuApi struct {
-	menuService     *service.MenuService
-	baseMenuService *service.BaseMenuService
+	MenuService     *service.MenuService
+	BaseMenuService *service.BaseMenuService
 }
 
 // GetMenu
@@ -36,7 +36,7 @@ type MenuApi struct {
 // @Success   200   {object}  response.Response{data=systemRes.SysMenusResponse,msg=string}  "获取用户动态路由,返回包括系统菜单详情列表"
 // @Router    /menu/getMenu [post]
 func (a *MenuApi) GetMenu(c *gin.Context) {
-	menus, err := a.menuService.GetMenuTree(utils.GetUserAuthorityId(c))
+	menus, err := a.MenuService.GetMenuTree(utils.GetUserAuthorityId(c))
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
@@ -58,7 +58,7 @@ func (a *MenuApi) GetMenu(c *gin.Context) {
 // @Router    /menu/getBaseMenuTree [post]
 func (a *MenuApi) GetBaseMenuTree(c *gin.Context) {
 	authority := utils.GetUserAuthorityId(c)
-	menus, err := a.menuService.GetBaseMenuTree(authority)
+	menus, err := a.MenuService.GetBaseMenuTree(authority)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
@@ -88,7 +88,7 @@ func (a *MenuApi) AddMenuAuthority(c *gin.Context) {
 		return
 	}
 	adminAuthorityID := utils.GetUserAuthorityId(c)
-	if err := a.menuService.AddMenuAuthority(authorityMenu.Menus, adminAuthorityID, authorityMenu.AuthorityId); err != nil {
+	if err := a.MenuService.AddMenuAuthority(authorityMenu.Menus, adminAuthorityID, authorityMenu.AuthorityId); err != nil {
 		zap_logger.Error("添加失败!", zap.Error(err))
 		response.FailWithMessage("添加失败", c)
 	} else {
@@ -117,7 +117,7 @@ func (a *MenuApi) GetMenuAuthority(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	menus, err := a.menuService.GetMenuAuthority(&param)
+	menus, err := a.MenuService.GetMenuAuthority(&param)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取失败", c)
@@ -152,7 +152,7 @@ func (a *MenuApi) AddBaseMenu(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.menuService.AddBaseMenu(menu)
+	err = a.MenuService.AddBaseMenu(menu)
 	if err != nil {
 		zap_logger.Error("添加失败!", zap.Error(err))
 		response.FailWithMessage("添加失败", c)
@@ -182,7 +182,7 @@ func (a *MenuApi) DeleteBaseMenu(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.baseMenuService.DeleteBaseMenu(menu.ID)
+	err = a.BaseMenuService.DeleteBaseMenu(menu.ID)
 	if err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败:"+err.Error(), c)
@@ -217,7 +217,7 @@ func (a *MenuApi) UpdateBaseMenu(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.baseMenuService.UpdateBaseMenu(menu)
+	err = a.BaseMenuService.UpdateBaseMenu(menu)
 	if err != nil {
 		zap_logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -247,7 +247,7 @@ func (a *MenuApi) GetBaseMenuById(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	menu, err := a.baseMenuService.GetBaseMenuById(idInfo.ID)
+	menu, err := a.BaseMenuService.GetBaseMenuById(idInfo.ID)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
@@ -267,7 +267,7 @@ func (a *MenuApi) GetBaseMenuById(c *gin.Context) {
 // @Router    /menu/getMenuList [post]
 func (a *MenuApi) GetMenuList(c *gin.Context) {
 	authorityID := utils.GetUserAuthorityId(c)
-	menuList, err := a.menuService.GetInfoList(authorityID)
+	menuList, err := a.MenuService.GetInfoList(authorityID)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

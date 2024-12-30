@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/db/system"
 	system2 "github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -13,12 +13,12 @@ import (
 
 func NewSysParamsApi(db *gorm.DB) *SysParamsApi {
 	return &SysParamsApi{
-		sysParamsService: service.NewSysParamsService(db),
+		SysParamsService: service.NewSysParamsService(db),
 	}
 }
 
 type SysParamsApi struct {
-	sysParamsService *service.SysParamsService
+	SysParamsService *service.SysParamsService
 }
 
 // CreateSysParams 创建参数
@@ -37,7 +37,7 @@ func (a *SysParamsApi) CreateSysParams(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.sysParamsService.CreateSysParams(&sysParams)
+	err = a.SysParamsService.CreateSysParams(&sysParams)
 	if err != nil {
 		zap_logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败:"+err.Error(), c)
@@ -57,7 +57,7 @@ func (a *SysParamsApi) CreateSysParams(c *gin.Context) {
 // @Router /sysParams/deleteSysParams [delete]
 func (a *SysParamsApi) DeleteSysParams(c *gin.Context) {
 	ID := c.Query("ID")
-	err := a.sysParamsService.DeleteSysParams(ID)
+	err := a.SysParamsService.DeleteSysParams(ID)
 	if err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败:"+err.Error(), c)
@@ -76,7 +76,7 @@ func (a *SysParamsApi) DeleteSysParams(c *gin.Context) {
 // @Router /sysParams/deleteSysParamsByIds [delete]
 func (a *SysParamsApi) DeleteSysParamsByIds(c *gin.Context) {
 	IDs := c.QueryArray("IDs[]")
-	err := a.sysParamsService.DeleteSysParamsByIds(IDs)
+	err := a.SysParamsService.DeleteSysParamsByIds(IDs)
 	if err != nil {
 		zap_logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败:"+err.Error(), c)
@@ -101,7 +101,7 @@ func (a *SysParamsApi) UpdateSysParams(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.sysParamsService.UpdateSysParams(sysParams)
+	err = a.SysParamsService.UpdateSysParams(sysParams)
 	if err != nil {
 		zap_logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败:"+err.Error(), c)
@@ -121,7 +121,7 @@ func (a *SysParamsApi) UpdateSysParams(c *gin.Context) {
 // @Router /sysParams/findSysParams [get]
 func (a *SysParamsApi) FindSysParams(c *gin.Context) {
 	ID := c.Query("ID")
-	resysParams, err := a.sysParamsService.GetSysParams(ID)
+	resysParams, err := a.SysParamsService.GetSysParams(ID)
 	if err != nil {
 		zap_logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败:"+err.Error(), c)
@@ -146,7 +146,7 @@ func (a *SysParamsApi) GetSysParamsList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := a.sysParamsService.GetSysParamsInfoList(pageInfo)
+	list, total, err := a.SysParamsService.GetSysParamsInfoList(pageInfo)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败:"+err.Error(), c)
@@ -171,7 +171,7 @@ func (a *SysParamsApi) GetSysParamsList(c *gin.Context) {
 // @Router /sysParams/getSysParam [get]
 func (a *SysParamsApi) GetSysParam(c *gin.Context) {
 	k := c.Query("key")
-	params, err := a.sysParamsService.GetSysParam(k)
+	params, err := a.SysParamsService.GetSysParam(k)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败:"+err.Error(), c)

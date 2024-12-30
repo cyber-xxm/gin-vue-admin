@@ -13,12 +13,12 @@ import (
 
 func NewAutoCodeTemplateApi(db *gorm.DB) *AutoCodeTemplateApi {
 	return &AutoCodeTemplateApi{
-		autoCodeTemplateService: service.NewAutoCodeTemplateService(db),
+		AutoCodeTemplateService: service.NewAutoCodeTemplateService(db),
 	}
 }
 
 type AutoCodeTemplateApi struct {
-	autoCodeTemplateService *service.AutoCodeTemplateService
+	AutoCodeTemplateService *service.AutoCodeTemplateService
 }
 
 // Preview
@@ -48,7 +48,7 @@ func (a *AutoCodeTemplateApi) Preview(c *gin.Context) {
 		return
 	}
 	info.PackageT = utils.FirstUpper(info.Package)
-	autoCode, err := a.autoCodeTemplateService.Preview(c.Request.Context(), info)
+	autoCode, err := a.AutoCodeTemplateService.Preview(c.Request.Context(), info)
 	if err != nil {
 		zap_logger.Error(err.Error(), zap.Error(err))
 		response.FailWithMessage("预览失败:"+err.Error(), c)
@@ -83,7 +83,7 @@ func (a *AutoCodeTemplateApi) Create(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.autoCodeTemplateService.Create(c.Request.Context(), info)
+	err = a.AutoCodeTemplateService.Create(c.Request.Context(), info)
 	if err != nil {
 		zap_logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
@@ -114,9 +114,9 @@ func (a *AutoCodeTemplateApi) AddFunc(c *gin.Context) {
 		info.FuncName = "填充funcName"
 		info.Method = "填充method"
 		info.Description = "填充description"
-		tempMap, err = a.autoCodeTemplateService.GetApiAndServer(info)
+		tempMap, err = a.AutoCodeTemplateService.GetApiAndServer(info)
 	} else {
-		err = a.autoCodeTemplateService.AddFunc(info)
+		err = a.AutoCodeTemplateService.AddFunc(info)
 	}
 	if err != nil {
 		zap_logger.Error("注入失败!", zap.Error(err))

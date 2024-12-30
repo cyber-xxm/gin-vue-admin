@@ -2,9 +2,9 @@ package system
 
 import (
 	"fmt"
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -13,12 +13,12 @@ import (
 
 func NewAutoCodePluginApi(db *gorm.DB) *AutoCodePluginApi {
 	return &AutoCodePluginApi{
-		autoCodePluginService: service.NewAutoCodePluginService(db),
+		AutoCodePluginService: service.NewAutoCodePluginService(db),
 	}
 }
 
 type AutoCodePluginApi struct {
-	autoCodePluginService service.AutoCodePluginService
+	AutoCodePluginService *service.AutoCodePluginService
 }
 
 // Install
@@ -36,7 +36,7 @@ func (a *AutoCodePluginApi) Install(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	web, server, err := a.autoCodePluginService.Install(header)
+	web, server, err := a.AutoCodePluginService.Install(header)
 	webStr := "web插件安装成功"
 	serverStr := "server插件安装成功"
 	if web == -1 {
@@ -71,7 +71,7 @@ func (a *AutoCodePluginApi) Install(c *gin.Context) {
 // @Router    /autoCode/pubPlug [post]
 func (a *AutoCodePluginApi) Packaged(c *gin.Context) {
 	plugName := c.Query("plugName")
-	zipPath, err := a.autoCodePluginService.PubPlug(plugName)
+	zipPath, err := a.AutoCodePluginService.PubPlug(plugName)
 	if err != nil {
 		zap_logger.Error("打包失败!", zap.Error(err))
 		response.FailWithMessage("打包失败"+err.Error(), c)
@@ -95,7 +95,7 @@ func (a *AutoCodePluginApi) InitMenu(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.autoCodePluginService.InitMenu(menuInfo)
+	err = a.AutoCodePluginService.InitMenu(menuInfo)
 	if err != nil {
 		zap_logger.Error("创建初始化Menu失败!", zap.Error(err))
 		response.FailWithMessage("创建初始化Menu失败"+err.Error(), c)
@@ -119,7 +119,7 @@ func (a *AutoCodePluginApi) InitAPI(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.autoCodePluginService.InitAPI(apiInfo)
+	err = a.AutoCodePluginService.InitAPI(apiInfo)
 	if err != nil {
 		zap_logger.Error("创建初始化API失败!", zap.Error(err))
 		response.FailWithMessage("创建初始化API失败"+err.Error(), c)

@@ -5,6 +5,7 @@ import (
 	"github.com/cyber-xxm/gin-vue-admin/internal/models"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils/request"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/goccy/go-json"
 	"gorm.io/gorm"
@@ -18,12 +19,12 @@ import (
 
 func NewAutoCodeApi(db *gorm.DB) *AutoCodeApi {
 	return &AutoCodeApi{
-		autoCodeService: service.NewAutoCodeHistoryService(db),
+		AutoCodeService: service.NewAutoCodeHistoryService(db),
 	}
 }
 
 type AutoCodeApi struct {
-	autoCodeService interface{}
+	AutoCodeService interface{}
 }
 
 // GetDB
@@ -36,7 +37,7 @@ type AutoCodeApi struct {
 // @Router    /autoCode/getDB [get]
 func (a *AutoCodeApi) GetDB(c *gin.Context) {
 	businessDB := c.Query("businessDB")
-	dbs, err := a.autoCodeService.Database(businessDB).GetDB(businessDB)
+	dbs, err := a.AutoCodeService.Database(businessDB).GetDB(businessDB)
 	var dbList []map[string]interface{}
 	for _, db := range global.GVA_CONFIG.DBList {
 		var item = make(map[string]interface{})
@@ -76,7 +77,7 @@ func (a *AutoCodeApi) GetTables(c *gin.Context) {
 		}
 	}
 
-	tables, err := a.autoCodeService.Database(businessDB).GetTables(businessDB, dbName)
+	tables, err := a.AutoCodeService.Database(businessDB).GetTables(businessDB, dbName)
 	if err != nil {
 		zap_logger.Error("查询table失败!", zap.Error(err))
 		response.FailWithMessage("查询table失败", c)
@@ -107,7 +108,7 @@ func (a *AutoCodeApi) GetColumn(c *gin.Context) {
 		}
 	}
 	tableName := c.Query("tableName")
-	columns, err := a.autoCodeService.Database(businessDB).GetColumn(businessDB, tableName, dbName)
+	columns, err := a.AutoCodeService.Database(businessDB).GetColumn(businessDB, tableName, dbName)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

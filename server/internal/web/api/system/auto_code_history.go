@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -13,12 +13,12 @@ import (
 
 func NewAutoCodeHistoryApi(db *gorm.DB) *AutoCodeHistoryApi {
 	return &AutoCodeHistoryApi{
-		autoCodeHistoryService: service.NewAutoCodeHistoryService(db),
+		AutoCodeHistoryService: service.NewAutoCodeHistoryService(db),
 	}
 }
 
 type AutoCodeHistoryApi struct {
-	autoCodeHistoryService *service.AutoCodeHistoryService
+	AutoCodeHistoryService *service.AutoCodeHistoryService
 }
 
 // First
@@ -37,7 +37,7 @@ func (a *AutoCodeHistoryApi) First(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	data, err := a.autoCodeHistoryService.First(c.Request.Context(), info)
+	data, err := a.AutoCodeHistoryService.First(c.Request.Context(), info)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -61,7 +61,7 @@ func (a *AutoCodeHistoryApi) Delete(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.autoCodeHistoryService.Delete(c.Request.Context(), info)
+	err = a.AutoCodeHistoryService.Delete(c.Request.Context(), info)
 	if err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -86,7 +86,7 @@ func (a *AutoCodeHistoryApi) RollBack(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.autoCodeHistoryService.RollBack(c.Request.Context(), info)
+	err = a.AutoCodeHistoryService.RollBack(c.Request.Context(), info)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -110,7 +110,7 @@ func (a *AutoCodeHistoryApi) GetList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := a.autoCodeHistoryService.GetList(c.Request.Context(), info)
+	list, total, err := a.AutoCodeHistoryService.GetList(c.Request.Context(), info)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -12,12 +12,12 @@ import (
 
 func NewAuthorityBtnApi(db *gorm.DB) *AuthorityBtnApi {
 	return &AuthorityBtnApi{
-		authorityBtnService: service.NewAuthorityBtnService(db),
+		AuthorityBtnService: service.NewAuthorityBtnService(db),
 	}
 }
 
 type AuthorityBtnApi struct {
-	authorityBtnService *service.AuthorityBtnService
+	AuthorityBtnService *service.AuthorityBtnService
 }
 
 // GetAuthorityBtn
@@ -36,7 +36,7 @@ func (a *AuthorityBtnApi) GetAuthorityBtn(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	res, err := a.authorityBtnService.GetAuthorityBtn(req)
+	res, err := a.AuthorityBtnService.GetAuthorityBtn(req)
 	if err != nil {
 		zap_logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -61,7 +61,7 @@ func (a *AuthorityBtnApi) SetAuthorityBtn(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.authorityBtnService.SetAuthorityBtn(req)
+	err = a.AuthorityBtnService.SetAuthorityBtn(req)
 	if err != nil {
 		zap_logger.Error("分配失败!", zap.Error(err))
 		response.FailWithMessage("分配失败", c)
@@ -80,7 +80,7 @@ func (a *AuthorityBtnApi) SetAuthorityBtn(c *gin.Context) {
 // @Router    /authorityBtn/canRemoveAuthorityBtn [post]
 func (a *AuthorityBtnApi) CanRemoveAuthorityBtn(c *gin.Context) {
 	id := c.Query("id")
-	err := a.authorityBtnService.CanRemoveAuthorityBtn(id)
+	err := a.AuthorityBtnService.CanRemoveAuthorityBtn(id)
 	if err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)

@@ -1,19 +1,28 @@
 package system
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/core/middleware"
+	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 )
 
-type AuthorityBtnRouter struct{}
+func NewAuthorityBtnRouter(authorityBtnApi *system.AuthorityBtnApi) *AuthorityBtnRouter {
+	return &AuthorityBtnRouter{
+		authorityBtnApi: authorityBtnApi,
+	}
+}
 
-var AuthorityBtnRouterApp = new(AuthorityBtnRouter)
+type AuthorityBtnRouter struct {
+	authorityBtnApi *system.AuthorityBtnApi
+}
 
-func (s *AuthorityBtnRouter) InitAuthorityBtnRouterRouter(Router *gin.RouterGroup) {
-	// authorityRouter := Router.Group("authorityBtn").Use(middleware.OperationRecord())
-	authorityRouterWithoutRecord := Router.Group("authorityBtn")
+func (r *AuthorityBtnRouter) InitAuthorityBtnRouterRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
+	authorityRouter := router.Group("authorityBtn").Use(middleware.OperationRecord(recordService))
+	authorityRouterWithoutRecord := router.Group("authorityBtn")
 	{
-		authorityRouterWithoutRecord.POST("getAuthorityBtn", authorityBtnApi.GetAuthorityBtn)
-		authorityRouterWithoutRecord.POST("setAuthorityBtn", authorityBtnApi.SetAuthorityBtn)
-		authorityRouterWithoutRecord.POST("canRemoveAuthorityBtn", authorityBtnApi.CanRemoveAuthorityBtn)
+		authorityRouterWithoutRecord.POST("getAuthorityBtn", r.authorityBtnApi.GetAuthorityBtn)
+		authorityRouterWithoutRecord.POST("setAuthorityBtn", r.authorityBtnApi.SetAuthorityBtn)
+		authorityRouterWithoutRecord.POST("canRemoveAuthorityBtn", r.authorityBtnApi.CanRemoveAuthorityBtn)
 	}
 }

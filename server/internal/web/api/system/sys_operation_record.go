@@ -1,12 +1,12 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/db/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request"
 	system2 "github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -15,12 +15,12 @@ import (
 
 func NewOperationRecordApi(db *gorm.DB) *OperationRecordApi {
 	return &OperationRecordApi{
-		operationRecordService: service.NewOperationRecordService(db),
+		OperationRecordService: service.NewOperationRecordService(db),
 	}
 }
 
 type OperationRecordApi struct {
-	operationRecordService *service.OperationRecordService
+	OperationRecordService *service.OperationRecordService
 }
 
 // CreateSysOperationRecord
@@ -39,7 +39,7 @@ func (a *OperationRecordApi) CreateSysOperationRecord(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.operationRecordService.CreateSysOperationRecord(sysOperationRecord)
+	err = a.OperationRecordService.CreateSysOperationRecord(sysOperationRecord)
 	if err != nil {
 		zap_logger.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
@@ -64,7 +64,7 @@ func (a *OperationRecordApi) DeleteSysOperationRecord(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.operationRecordService.DeleteSysOperationRecord(sysOperationRecord)
+	err = a.OperationRecordService.DeleteSysOperationRecord(sysOperationRecord)
 	if err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -89,7 +89,7 @@ func (a *OperationRecordApi) DeleteSysOperationRecordByIds(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.operationRecordService.DeleteSysOperationRecordByIds(IDS)
+	err = a.OperationRecordService.DeleteSysOperationRecordByIds(IDS)
 	if err != nil {
 		zap_logger.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
@@ -119,7 +119,7 @@ func (a *OperationRecordApi) FindSysOperationRecord(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	reSysOperationRecord, err := a.operationRecordService.GetSysOperationRecord(sysOperationRecord.ID)
+	reSysOperationRecord, err := a.OperationRecordService.GetSysOperationRecord(sysOperationRecord.ID)
 	if err != nil {
 		zap_logger.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -144,7 +144,7 @@ func (a *OperationRecordApi) GetSysOperationRecordList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := a.operationRecordService.GetSysOperationRecordInfoList(pageInfo)
+	list, total, err := a.OperationRecordService.GetSysOperationRecordInfoList(pageInfo)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

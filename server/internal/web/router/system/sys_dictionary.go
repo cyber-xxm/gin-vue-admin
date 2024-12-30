@@ -1,22 +1,32 @@
 package system
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/web/core/middleware"
+	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 )
 
-type DictionaryRouter struct{}
+func NewDictionaryRouter(dictionaryApi *system.DictionaryApi) *DictionaryRouter {
+	return &DictionaryRouter{
+		dictionaryApi: dictionaryApi,
+	}
+}
 
-func (s *DictionaryRouter) InitSysDictionaryRouter(Router *gin.RouterGroup) {
-	sysDictionaryRouter := Router.Group("sysDictionary").Use(middleware.OperationRecord())
-	sysDictionaryRouterWithoutRecord := Router.Group("sysDictionary")
+type DictionaryRouter struct {
+	dictionaryApi *system.DictionaryApi
+}
+
+func (r *DictionaryRouter) InitSysDictionaryRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
+	sysDictionaryRouter := router.Group("sysDictionary").Use(middleware.OperationRecord(recordService))
+	sysDictionaryRouterWithoutRecord := router.Group("sysDictionary")
 	{
-		sysDictionaryRouter.POST("createSysDictionary", dictionaryApi.CreateSysDictionary)   // 新建SysDictionary
-		sysDictionaryRouter.DELETE("deleteSysDictionary", dictionaryApi.DeleteSysDictionary) // 删除SysDictionary
-		sysDictionaryRouter.PUT("updateSysDictionary", dictionaryApi.UpdateSysDictionary)    // 更新SysDictionary
+		sysDictionaryRouter.POST("createSysDictionary", r.dictionaryApi.CreateSysDictionary)   // 新建SysDictionary
+		sysDictionaryRouter.DELETE("deleteSysDictionary", r.dictionaryApi.DeleteSysDictionary) // 删除SysDictionary
+		sysDictionaryRouter.PUT("updateSysDictionary", r.dictionaryApi.UpdateSysDictionary)    // 更新SysDictionary
 	}
 	{
-		sysDictionaryRouterWithoutRecord.GET("findSysDictionary", dictionaryApi.FindSysDictionary)       // 根据ID获取SysDictionary
-		sysDictionaryRouterWithoutRecord.GET("getSysDictionaryList", dictionaryApi.GetSysDictionaryList) // 获取SysDictionary列表
+		sysDictionaryRouterWithoutRecord.GET("findSysDictionary", r.dictionaryApi.FindSysDictionary)       // 根据ID获取SysDictionary
+		sysDictionaryRouterWithoutRecord.GET("getSysDictionaryList", r.dictionaryApi.GetSysDictionaryList) // 获取SysDictionary列表
 	}
 }

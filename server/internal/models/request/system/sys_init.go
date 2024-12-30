@@ -2,7 +2,7 @@ package system
 
 import (
 	"fmt"
-	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/db/orm"
+	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/orm"
 	"os"
 )
 

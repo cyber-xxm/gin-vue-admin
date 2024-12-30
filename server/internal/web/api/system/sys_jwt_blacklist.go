@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/db/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -13,12 +13,12 @@ import (
 
 func NewJwtApi(db *gorm.DB) *JwtApi {
 	return &JwtApi{
-		jwtService: service.NewJwtService(db),
+		JwtService: service.NewJwtService(db),
 	}
 }
 
 type JwtApi struct {
-	jwtService *service.JwtService
+	JwtService *service.JwtService
 }
 
 // JsonInBlacklist
@@ -32,7 +32,7 @@ type JwtApi struct {
 func (a *JwtApi) JsonInBlacklist(c *gin.Context) {
 	token := utils.GetToken(c)
 	jwt := system.JwtBlacklist{Jwt: token}
-	err := a.jwtService.JsonInBlacklist(jwt)
+	err := a.JwtService.JsonInBlacklist(jwt)
 	if err != nil {
 		zap_logger.Error("jwt作废失败!", zap.Error(err))
 		response.FailWithMessage("jwt作废失败", c)

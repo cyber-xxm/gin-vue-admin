@@ -8,6 +8,7 @@ import (
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	systemRes "github.com/cyber-xxm/gin-vue-admin/internal/models/response/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"gorm.io/gorm"
 	"strconv"
@@ -22,14 +23,14 @@ import (
 
 func NewBaseApi(db *gorm.DB) *BaseApi {
 	return &BaseApi{
-		userService: service.NewUserService(db),
-		jwtService:  service.NewJwtService(db),
+		UserService: service.NewUserService(db),
+		JwtService:  service.NewJwtService(db),
 	}
 }
 
 type BaseApi struct {
-	userService *service.UserService
-	jwtService  *service.JwtService
+	UserService *service.UserService
+	JwtService  *service.JwtService
 }
 
 // Login
@@ -66,7 +67,7 @@ func (a *BaseApi) Login(c *gin.Context) {
 
 	if !oc || (l.CaptchaId != "" && l.Captcha != "" && store.Verify(l.CaptchaId, l.Captcha, true)) {
 		u := &system.SysUser{Username: l.Username, Password: l.Password}
-		user, err := a.userService.Login(u)
+		user, err := a.UserService.Login(u)
 		if err != nil {
 			zap_logger.Error("登陆失败! 用户名不存在或者密码错误!", zap.Error(err))
 			// 验证码次数+1
@@ -107,8 +108,8 @@ func (a *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 		return
 	}
 
-	if jwtStr, err := a.jwtService.GetRedisJWT(user.Username); err == redis.Nil {
-		if err := a.jwtService.SetRedisJWT(token, user.Username); err != nil {
+	if jwtStr, err := a.JwtService.GetRedisJWT(user.Username); err == redis.Nil {
+		if err := a.JwtService.SetRedisJWT(token, user.Username); err != nil {
 			zap_logger.Error("设置登录状态失败!", zap.Error(err))
 			response.FailWithMessage("设置登录状态失败", c)
 			return
@@ -125,11 +126,11 @@ func (a *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 	} else {
 		var blackJWT system.JwtBlacklist
 		blackJWT.Jwt = jwtStr
-		if err := a.jwtService.JsonInBlacklist(blackJWT); err != nil {
+		if err := a.JwtService.JsonInBlacklist(blackJWT); err != nil {
 			response.FailWithMessage("jwt作废失败", c)
 			return
 		}
-		if err := a.jwtService.SetRedisJWT(token, user.GetUsername()); err != nil {
+		if err := a.JwtService.SetRedisJWT(token, user.GetUsername()); err != nil {
 			response.FailWithMessage("设置登录状态失败", c)
 			return
 		}
@@ -168,7 +169,7 @@ func (a *BaseApi) Register(c *gin.Context) {
 		})
 	}
 	user := &system.SysUser{Username: r.Username, NickName: r.NickName, Password: r.Password, HeaderImg: r.HeaderImg, AuthorityId: r.AuthorityId, Authorities: authorities, Enable: r.Enable, Phone: r.Phone, Email: r.Email}
-	userReturn, err := a.userService.Register(*user)
+	userReturn, err := a.UserService.Register(*user)
 	if err != nil {
 		zap_logger.Error("注册失败!", zap.Error(err))
 		response.FailWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册失败", c)
@@ -200,7 +201,7 @@ func (a *BaseApi) ChangePassword(c *gin.Context) {
 	uid := utils.GetUserID(c)
 	u := &system.SysUser{Password: req.Password}
 	u.ID = uid
-	_, err = a.userService.ChangePassword(u, req.NewPassword)
+	_, err = a.UserService.ChangePassword(u, req.NewPassword)
 	if err != nil {
 		zap_logger.Error("修改失败!", zap.Error(err))
 		response.FailWithMessage("修改失败，原密码与当前账户不符", c)
@@ -230,7 +231,7 @@ func (a *BaseApi) GetUserList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := a.userService.GetUserInfoList(pageInfo)
+	list, total, err := a.UserService.GetUserInfoList(pageInfo)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
@@ -265,7 +266,7 @@ func (a *BaseApi) SetUserAuthority(c *gin.Context) {
 		return
 	}
 	userID := utils.GetUserID(c)
-	err = a.userService.SetUserAuthority(userID, sua.AuthorityId)
+	err = a.UserService.SetUserAuthority(userID, sua.AuthorityId)
 	if err != nil {
 		zap_logger.Error("修改失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
@@ -302,7 +303,7 @@ func (a *BaseApi) SetUserAuthorities(c *gin.Context) {
 		return
 	}
 	authorityID := utils.GetUserAuthorityId(c)
-	err = a.userService.SetUserAuthorities(authorityID, sua.ID, sua.AuthorityIds)
+	err = a.UserService.SetUserAuthorities(authorityID, sua.ID, sua.AuthorityIds)
 	if err != nil {
 		zap_logger.Error("修改失败!", zap.Error(err))
 		response.FailWithMessage("修改失败", c)
@@ -337,7 +338,7 @@ func (a *BaseApi) DeleteUser(c *gin.Context) {
 		response.FailWithMessage("删除失败, 无法删除自己。", c)
 		return
 	}
-	err = a.userService.DeleteUser(reqId.ID)
+	err = a.UserService.DeleteUser(reqId.ID)
 	if err != nil {
 		zap_logger.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -369,7 +370,7 @@ func (a *BaseApi) SetUserInfo(c *gin.Context) {
 	}
 	if len(user.AuthorityIds) != 0 {
 		authorityID := utils.GetUserAuthorityId(c)
-		err = a.userService.SetUserAuthorities(authorityID, user.ID, user.AuthorityIds)
+		err = a.UserService.SetUserAuthorities(authorityID, user.ID, user.AuthorityIds)
 		if err != nil {
 			zap_logger.Error("设置失败!", zap.Error(err))
 			response.FailWithMessage("设置失败", c)
@@ -384,7 +385,7 @@ func (a *BaseApi) SetUserInfo(c *gin.Context) {
 		Enable:    user.Enable,
 	}
 	sysUser.ID = user.ID
-	err = a.userService.SetUserInfo(sysUser)
+	err = a.UserService.SetUserInfo(sysUser)
 	if err != nil {
 		zap_logger.Error("设置失败!", zap.Error(err))
 		response.FailWithMessage("设置失败", c)
@@ -417,7 +418,7 @@ func (a *BaseApi) SetSelfInfo(c *gin.Context) {
 		Enable:    user.Enable,
 	}
 	sysUser.ID = user.ID
-	err = a.userService.SetSelfInfo(sysUser)
+	err = a.UserService.SetSelfInfo(sysUser)
 	if err != nil {
 		zap_logger.Error("设置失败!", zap.Error(err))
 		response.FailWithMessage("设置失败", c)
@@ -443,7 +444,7 @@ func (a *BaseApi) SetSelfSetting(c *gin.Context) {
 		return
 	}
 
-	err = a.userService.SetSelfSetting(req, utils.GetUserID(c))
+	err = a.UserService.SetSelfSetting(req, utils.GetUserID(c))
 	if err != nil {
 		zap_logger.Error("设置失败!", zap.Error(err))
 		response.FailWithMessage("设置失败", c)
@@ -462,7 +463,7 @@ func (a *BaseApi) SetSelfSetting(c *gin.Context) {
 // @Router    /user/getUserInfo [get]
 func (a *BaseApi) GetUserInfo(c *gin.Context) {
 	uuid := utils.GetUserUuid(c)
-	ReqUser, err := a.userService.GetUserInfo(uuid)
+	ReqUser, err := a.UserService.GetUserInfo(uuid)
 	if err != nil {
 		zap_logger.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
@@ -486,7 +487,7 @@ func (a *BaseApi) ResetPassword(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = a.userService.ResetPassword(user.ID)
+	err = a.UserService.ResetPassword(user.ID)
 	if err != nil {
 		zap_logger.Error("重置失败!", zap.Error(err))
 		response.FailWithMessage("重置失败"+err.Error(), c)

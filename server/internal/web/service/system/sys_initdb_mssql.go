@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/cyber-xxm/gin-vue-admin/global"
-	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/db/orm"
+	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/orm"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
 	"github.com/gofrs/uuid/v5"

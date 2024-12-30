@@ -4,6 +4,7 @@ import (
 	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -13,12 +14,12 @@ import (
 
 func NewDBApi(db *gorm.DB) *DBApi {
 	return &DBApi{
-		autoCodeHistoryService: service.NewInitDBService(db),
+		InitDBService: service.NewInitDBService(db),
 	}
 }
 
 type DBApi struct {
-	initDBService *service.InitDBService
+	InitDBService *service.InitDBService
 }
 
 // InitDB
@@ -40,7 +41,7 @@ func (a *DBApi) InitDB(c *gin.Context) {
 		response.FailWithMessage("参数校验不通过", c)
 		return
 	}
-	if err := a.initDBService.InitDB(dbInfo); err != nil {
+	if err := a.InitDBService.InitDB(dbInfo); err != nil {
 		zap_logger.Error("自动创建数据库失败!", zap.Error(err))
 		response.FailWithMessage("自动创建数据库失败，请查看后台日志，检查后在进行初始化", c)
 		return

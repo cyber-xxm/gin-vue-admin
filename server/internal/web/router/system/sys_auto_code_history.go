@@ -1,17 +1,26 @@
 package system
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
 	"github.com/gin-gonic/gin"
 )
 
-type AutoCodeHistoryRouter struct{}
+func NewAutoCodeHistoryRouter(autocodeHistoryApi *system.AutoCodeHistoryApi) *AutoCodeHistoryRouter {
+	return &AutoCodeHistoryRouter{
+		autocodeHistoryApi: autocodeHistoryApi,
+	}
+}
 
-func (s *AutoCodeRouter) InitAutoCodeHistoryRouter(Router *gin.RouterGroup) {
-	autoCodeHistoryRouter := Router.Group("autoCode")
+type AutoCodeHistoryRouter struct {
+	autocodeHistoryApi *system.AutoCodeHistoryApi
+}
+
+func (r *AutoCodeHistoryRouter) InitAutoCodeHistoryRouter(router *gin.RouterGroup) {
+	autoCodeHistoryRouter := router.Group("autoCode")
 	{
-		autoCodeHistoryRouter.POST("getMeta", autocodeHistoryApi.First)         // 根据id获取meta信息
-		autoCodeHistoryRouter.POST("rollback", autocodeHistoryApi.RollBack)     // 回滚
-		autoCodeHistoryRouter.POST("delSysHistory", autocodeHistoryApi.Delete)  // 删除回滚记录
-		autoCodeHistoryRouter.POST("getSysHistory", autocodeHistoryApi.GetList) // 获取回滚记录分页
+		autoCodeHistoryRouter.POST("getMeta", r.autocodeHistoryApi.First)         // 根据id获取meta信息
+		autoCodeHistoryRouter.POST("rollback", r.autocodeHistoryApi.RollBack)     // 回滚
+		autoCodeHistoryRouter.POST("delSysHistory", r.autocodeHistoryApi.Delete)  // 删除回滚记录
+		autoCodeHistoryRouter.POST("getSysHistory", r.autocodeHistoryApi.GetList) // 获取回滚记录分页
 	}
 }

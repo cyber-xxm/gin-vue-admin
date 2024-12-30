@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/db/orm"
+	"github.com/cyber-xxm/gin-vue-admin/internal/initialize/orm"
 	sysResp "github.com/cyber-xxm/gin-vue-admin/internal/models/response/system"
 	"gorm.io/gorm"
 )

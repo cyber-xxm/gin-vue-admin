@@ -1,11 +1,11 @@
 package system
 
 import (
-	"github.com/cyber-xxm/gin-vue-admin/global"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/request/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/models/response"
 	systemRes "github.com/cyber-xxm/gin-vue-admin/internal/models/response/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/utils"
+	zap_logger "github.com/cyber-xxm/gin-vue-admin/internal/utils/zap-logger"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -14,12 +14,12 @@ import (
 
 func NewCasbinApi(db *gorm.DB) *CasbinApi {
 	return &CasbinApi{
-		casbinService: service.NewCasbinService(db),
+		CasbinService: service.NewCasbinService(db),
 	}
 }
 
 type CasbinApi struct {
-	casbinService *service.CasbinService
+	CasbinService *service.CasbinService
 }
 
 // UpdateCasbin
@@ -44,7 +44,7 @@ func (a *CasbinApi) UpdateCasbin(c *gin.Context) {
 		return
 	}
 	adminAuthorityID := utils.GetUserAuthorityId(c)
-	err = a.casbinService.UpdateCasbin(adminAuthorityID, cmr.AuthorityId, cmr.CasbinInfos)
+	err = a.CasbinService.UpdateCasbin(adminAuthorityID, cmr.AuthorityId, cmr.CasbinInfos)
 	if err != nil {
 		zap_logger.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -74,6 +74,6 @@ func (a *CasbinApi) GetPolicyPathByAuthorityId(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	paths := a.casbinService.GetPolicyPathByAuthorityId(casbin.AuthorityId)
+	paths := a.CasbinService.GetPolicyPathByAuthorityId(casbin.AuthorityId)
 	response.OkWithDetailed(systemRes.PolicyPathResponse{Paths: paths}, "获取成功", c)
 }

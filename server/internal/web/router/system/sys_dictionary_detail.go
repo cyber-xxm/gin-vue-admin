@@ -1,22 +1,32 @@
 package system
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/web/core/middleware"
+	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"github.com/gin-gonic/gin"
 )
 
-type DictionaryDetailRouter struct{}
+func NewDictionaryDetailRouter(dictionaryDetailApi *system.DictionaryDetailApi) *DictionaryDetailRouter {
+	return &DictionaryDetailRouter{
+		dictionaryDetailApi: dictionaryDetailApi,
+	}
+}
 
-func (s *DictionaryDetailRouter) InitSysDictionaryDetailRouter(Router *gin.RouterGroup) {
-	dictionaryDetailRouter := Router.Group("sysDictionaryDetail").Use(middleware.OperationRecord())
-	dictionaryDetailRouterWithoutRecord := Router.Group("sysDictionaryDetail")
+type DictionaryDetailRouter struct {
+	dictionaryDetailApi *system.DictionaryDetailApi
+}
+
+func (r *DictionaryDetailRouter) InitSysDictionaryDetailRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
+	dictionaryDetailRouter := router.Group("sysDictionaryDetail").Use(middleware.OperationRecord(recordService))
+	dictionaryDetailRouterWithoutRecord := router.Group("sysDictionaryDetail")
 	{
-		dictionaryDetailRouter.POST("createSysDictionaryDetail", dictionaryDetailApi.CreateSysDictionaryDetail)   // 新建SysDictionaryDetail
-		dictionaryDetailRouter.DELETE("deleteSysDictionaryDetail", dictionaryDetailApi.DeleteSysDictionaryDetail) // 删除SysDictionaryDetail
-		dictionaryDetailRouter.PUT("updateSysDictionaryDetail", dictionaryDetailApi.UpdateSysDictionaryDetail)    // 更新SysDictionaryDetail
+		dictionaryDetailRouter.POST("createSysDictionaryDetail", r.dictionaryDetailApi.CreateSysDictionaryDetail)   // 新建SysDictionaryDetail
+		dictionaryDetailRouter.DELETE("deleteSysDictionaryDetail", r.dictionaryDetailApi.DeleteSysDictionaryDetail) // 删除SysDictionaryDetail
+		dictionaryDetailRouter.PUT("updateSysDictionaryDetail", r.dictionaryDetailApi.UpdateSysDictionaryDetail)    // 更新SysDictionaryDetail
 	}
 	{
-		dictionaryDetailRouterWithoutRecord.GET("findSysDictionaryDetail", dictionaryDetailApi.FindSysDictionaryDetail)       // 根据ID获取SysDictionaryDetail
-		dictionaryDetailRouterWithoutRecord.GET("getSysDictionaryDetailList", dictionaryDetailApi.GetSysDictionaryDetailList) // 获取SysDictionaryDetail列表
+		dictionaryDetailRouterWithoutRecord.GET("findSysDictionaryDetail", r.dictionaryDetailApi.FindSysDictionaryDetail)       // 根据ID获取SysDictionaryDetail
+		dictionaryDetailRouterWithoutRecord.GET("getSysDictionaryDetailList", r.dictionaryDetailApi.GetSysDictionaryDetailList) // 获取SysDictionaryDetail列表
 	}
 }
