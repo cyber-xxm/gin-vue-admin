@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewAuthorityBtnRouter(authorityBtnApi *system.AuthorityBtnApi) *AuthorityBtnRouter {
+func NewAuthorityBtnRouter(authorityBtnApi *system.AuthorityBtnApi, recordService *service.OperationRecordService) *AuthorityBtnRouter {
 	return &AuthorityBtnRouter{
 		authorityBtnApi: authorityBtnApi,
 	}
@@ -15,10 +15,11 @@ func NewAuthorityBtnRouter(authorityBtnApi *system.AuthorityBtnApi) *AuthorityBt
 
 type AuthorityBtnRouter struct {
 	authorityBtnApi *system.AuthorityBtnApi
+	recordService   *service.OperationRecordService
 }
 
-func (r *AuthorityBtnRouter) InitAuthorityBtnRouterRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
-	authorityRouter := router.Group("authorityBtn").Use(middleware.OperationRecord(recordService))
+func (r *AuthorityBtnRouter) InitAuthorityBtnRouterRouter(router *gin.RouterGroup) {
+	authorityRouter := router.Group("authorityBtn").Use(middleware.OperationRecord(r.recordService))
 	authorityRouterWithoutRecord := router.Group("authorityBtn")
 	{
 		authorityRouterWithoutRecord.POST("getAuthorityBtn", r.authorityBtnApi.GetAuthorityBtn)

@@ -7,18 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewSystemApiRouter(systemApi *system.SystemApi) *ApiRouter {
+func NewSystemApiRouter(systemApi *system.SystemApi, recordService *service.OperationRecordService) *ApiRouter {
 	return &ApiRouter{
-		systemApi: systemApi,
+		systemApi:     systemApi,
+		recordService: recordService,
 	}
 }
 
 type ApiRouter struct {
-	systemApi *system.SystemApi
+	systemApi     *system.SystemApi
+	recordService *service.OperationRecordService
 }
 
-func (r *ApiRouter) InitApiRouter(router *gin.RouterGroup, pub *gin.RouterGroup, recordService *service.OperationRecordService) {
-	apiRouter := router.Group("api").Use(middleware.OperationRecord(recordService))
+func (r *ApiRouter) InitApiRouter(router *gin.RouterGroup, pub *gin.RouterGroup) {
+	apiRouter := router.Group("api").Use(middleware.OperationRecord(r.recordService))
 	apiRouterWithoutRecord := router.Group("api")
 
 	apiPublicRouterWithoutRecord := pub.Group("api")

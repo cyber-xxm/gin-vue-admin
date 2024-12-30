@@ -8,6 +8,7 @@ import (
 	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/system"
 	"github.com/cyber-xxm/gin-vue-admin/internal/web/core/middleware"
 	"github.com/cyber-xxm/gin-vue-admin/internal/web/core/plugin"
+	exampleRouter "github.com/cyber-xxm/gin-vue-admin/internal/web/router/example"
 	systemRouter "github.com/cyber-xxm/gin-vue-admin/internal/web/router/system"
 	service "github.com/cyber-xxm/gin-vue-admin/internal/web/service/system"
 	"gorm.io/gorm"
@@ -66,43 +67,29 @@ func Routers(rootCtx context.Context) *gin.Engine {
 	if gin.Mode() == gin.DebugMode {
 		r.Use(gin.Logger())
 	}
-	codeHistoryApi := system.NewAutoCodeHistoryApi(db)
-	codePackageApi := system.NewAutoCodePackageApi(db)
-	codePluginApi := system.NewAutoCodePluginApi(db)
-	codeTemplateApi := system.NewAutoCodeTemplateApi(db)
-	systemApi := system.NewSystemApi(db)
-	authorityApi := system.NewAuthorityApi(db)
-	authorityBtnApi := system.NewAuthorityBtnApi(db)
-	autoCodeApi := system.NewAutoCodeApi(db)
-	casbinApi := system.NewCasbinApi(db)
-	configApi := system.NewConfigApi(db)
-	dictionaryApi := system.NewDictionaryApi(db)
-	dictionaryDetailApi := system.NewDictionaryDetailApi(db)
-	exportTemplateApi := system.NewSysExportTemplateApi(db)
-	dbApi := system.NewDBApi(db)
-	jwtApi := system.NewJwtApi(db)
-	menuApi := system.NewMenuApi(db)
+
 	operationRecordApi := system.NewOperationRecordApi(db)
-	sysParamsApi := system.NewSysParamsApi(db)
 	baseApi := system.NewBaseApi(db)
 
-	systemApiRouter := systemRouter.NewSystemApiRouter(systemApi)
-	authorityRouter := systemRouter.NewAuthorityRouter(authorityApi)
-	authorityBtnRouter := systemRouter.NewAuthorityBtnRouter(authorityBtnApi)
-	autoCodeRouter := systemRouter.NewAutoCodeRouter(autoCodeApi, codeTemplateApi, codePackageApi, codePluginApi)
-	codeHistoryRouter := systemRouter.NewAutoCodeHistoryRouter(codeHistoryApi)
+	systemApiRouter := systemRouter.NewSystemApiRouter(system.NewSystemApi(db), operationRecordApi.OperationRecordService)
+	authorityRouter := systemRouter.NewAuthorityRouter(system.NewAuthorityApi(db), operationRecordApi.OperationRecordService)
+	authorityBtnRouter := systemRouter.NewAuthorityBtnRouter(system.NewAuthorityBtnApi(db), operationRecordApi.OperationRecordService)
+	autoCodeRouter := systemRouter.NewAutoCodeRouter(system.NewAutoCodeApi(db), system.NewAutoCodeTemplateApi(db), system.NewAutoCodePackageApi(db), system.NewAutoCodePluginApi(db))
+	codeHistoryRouter := systemRouter.NewAutoCodeHistoryRouter(system.NewAutoCodeHistoryApi(db))
 	baseRouter := systemRouter.NewBaseRouter(baseApi)
-	casbinRouter := systemRouter.NewCasbinRouter(casbinApi)
-	dictionaryRouter := systemRouter.NewDictionaryRouter(dictionaryApi)
-	dictionaryDetailRouter := systemRouter.NewDictionaryDetailRouter(dictionaryDetailApi)
-	exportTemplateRouter := systemRouter.NewSysExportTemplateRouter(exportTemplateApi)
-	initDbRouter := systemRouter.NewInitRouter(dbApi)
-	jwtRouter := systemRouter.NewJwtRouter(jwtApi)
-	menuRouter := systemRouter.NewMenuRouter(menuApi)
+	casbinRouter := systemRouter.NewCasbinRouter(system.NewCasbinApi(db), operationRecordApi.OperationRecordService)
+	dictionaryRouter := systemRouter.NewDictionaryRouter(system.NewDictionaryApi(db), operationRecordApi.OperationRecordService)
+	dictionaryDetailRouter := systemRouter.NewDictionaryDetailRouter(system.NewDictionaryDetailApi(db), operationRecordApi.OperationRecordService)
+	exportTemplateRouter := systemRouter.NewSysExportTemplateRouter(system.NewSysExportTemplateApi(db), operationRecordApi.OperationRecordService)
+	initDbRouter := systemRouter.NewInitRouter(system.NewDBApi(db))
+	jwtRouter := systemRouter.NewJwtRouter(system.NewJwtApi(db))
+	menuRouter := systemRouter.NewMenuRouter(system.NewMenuApi(db), operationRecordApi.OperationRecordService)
 	operationRecordRouter := systemRouter.NewOperationRecordRouter(operationRecordApi)
-	sysParamsRouter := systemRouter.NewSysParamsRouter(sysParamsApi)
-	configRouter := systemRouter.NewConfigRouter(configApi)
-	userRouter := systemRouter.NewUserRouter(baseApi)
+	sysParamsRouter := systemRouter.NewSysParamsRouter(system.NewSysParamsApi(db), operationRecordApi.OperationRecordService)
+	configRouter := systemRouter.NewConfigRouter(system.NewConfigApi(db), operationRecordApi.OperationRecordService)
+	userRouter := systemRouter.NewUserRouter(baseApi, operationRecordApi.OperationRecordService)
+
+	exampleRouter.NewCustomerRouter(example.new)
 
 	// 如果想要不使用nginx代理前端网页，可以修改 web/.env.production 下的
 	// VUE_APP_BASE_API = /
@@ -139,23 +126,23 @@ func Routers(rootCtx context.Context) *gin.Engine {
 	}
 
 	{
-		systemApiRouter.InitApiRouter(PrivateGroup, PublicGroup, operationRecordApi.OperationRecordService)           // 注册功能api路由
-		jwtRouter.InitJwtRouter(PrivateGroup)                                                                         // jwt相关路由
-		userRouter.InitUserRouter(PrivateGroup, operationRecordApi.OperationRecordService)                            // 注册用户路由
-		menuRouter.InitMenuRouter(PrivateGroup, operationRecordApi.OperationRecordService)                            // 注册menu路由
-		configRouter.InitSystemRouter(PrivateGroup, operationRecordApi.OperationRecordService)                        // system相关路由
-		casbinRouter.InitCasbinRouter(PrivateGroup, operationRecordApi.OperationRecordService)                        // 权限相关路由
-		autoCodeRouter.InitAutoCodeRouter(PrivateGroup, PublicGroup)                                                  // 创建自动化代码
-		authorityRouter.InitAuthorityRouter(PrivateGroup, operationRecordApi.OperationRecordService)                  // 注册角色路由
-		dictionaryRouter.InitSysDictionaryRouter(PrivateGroup, operationRecordApi.OperationRecordService)             // 字典管理
-		codeHistoryRouter.InitAutoCodeHistoryRouter(PrivateGroup)                                                     // 自动化代码历史
-		operationRecordRouter.InitSysOperationRecordRouter(PrivateGroup)                                              // 操作记录
-		dictionaryDetailRouter.InitSysDictionaryDetailRouter(PrivateGroup, operationRecordApi.OperationRecordService) // 字典详情管理
-		authorityBtnRouter.InitAuthorityBtnRouterRouter(PrivateGroup, operationRecordApi.OperationRecordService)      // 按钮权限管理
-		exportTemplateRouter.InitSysExportTemplateRouter(PrivateGroup, operationRecordApi.OperationRecordService)     // 导出模板
-		sysParamsRouter.InitSysParamsRouter(PrivateGroup, operationRecordApi.OperationRecordService)                  // 参数管理
-		exampleRouter.InitCustomerRouter(PrivateGroup)                                                                // 客户路由
-		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup)                                                   // 文件上传下载功能路由
+		systemApiRouter.InitApiRouter(PrivateGroup, PublicGroup)           // 注册功能api路由
+		jwtRouter.InitJwtRouter(PrivateGroup)                              // jwt相关路由
+		userRouter.InitUserRouter(PrivateGroup)                            // 注册用户路由
+		menuRouter.InitMenuRouter(PrivateGroup)                            // 注册menu路由
+		configRouter.InitSystemRouter(PrivateGroup)                        // system相关路由
+		casbinRouter.InitCasbinRouter(PrivateGroup)                        // 权限相关路由
+		autoCodeRouter.InitAutoCodeRouter(PrivateGroup, PublicGroup)       // 创建自动化代码
+		authorityRouter.InitAuthorityRouter(PrivateGroup)                  // 注册角色路由
+		dictionaryRouter.InitSysDictionaryRouter(PrivateGroup)             // 字典管理
+		codeHistoryRouter.InitAutoCodeHistoryRouter(PrivateGroup)          // 自动化代码历史
+		operationRecordRouter.InitSysOperationRecordRouter(PrivateGroup)   // 操作记录
+		dictionaryDetailRouter.InitSysDictionaryDetailRouter(PrivateGroup) // 字典详情管理
+		authorityBtnRouter.InitAuthorityBtnRouterRouter(PrivateGroup)      // 按钮权限管理
+		exportTemplateRouter.InitSysExportTemplateRouter(PrivateGroup)     // 导出模板
+		sysParamsRouter.InitSysParamsRouter(PrivateGroup)                  // 参数管理
+		exampleRouter.InitCustomerRouter(PrivateGroup)                     // 客户路由
+		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup)        // 文件上传下载功能路由
 
 	}
 

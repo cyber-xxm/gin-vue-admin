@@ -7,18 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewUserRouter(baseApi *system.BaseApi) *UserRouter {
+func NewUserRouter(baseApi *system.BaseApi, recordService *service.OperationRecordService) *UserRouter {
 	return &UserRouter{
-		baseApi: baseApi,
+		baseApi:       baseApi,
+		recordService: recordService,
 	}
 }
 
 type UserRouter struct {
-	baseApi *system.BaseApi
+	baseApi       *system.BaseApi
+	recordService *service.OperationRecordService
 }
 
-func (r *UserRouter) InitUserRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
-	userRouter := router.Group("user").Use(middleware.OperationRecord(recordService))
+func (r *UserRouter) InitUserRouter(router *gin.RouterGroup) {
+	userRouter := router.Group("user").Use(middleware.OperationRecord(r.recordService))
 	userRouterWithoutRecord := router.Group("user")
 	{
 		userRouter.POST("admin_register", r.baseApi.Register)               // 管理员注册账号

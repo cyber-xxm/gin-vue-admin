@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewDictionaryDetailRouter(dictionaryDetailApi *system.DictionaryDetailApi) *DictionaryDetailRouter {
+func NewDictionaryDetailRouter(dictionaryDetailApi *system.DictionaryDetailApi, recordService *service.OperationRecordService) *DictionaryDetailRouter {
 	return &DictionaryDetailRouter{
 		dictionaryDetailApi: dictionaryDetailApi,
 	}
@@ -15,10 +15,11 @@ func NewDictionaryDetailRouter(dictionaryDetailApi *system.DictionaryDetailApi) 
 
 type DictionaryDetailRouter struct {
 	dictionaryDetailApi *system.DictionaryDetailApi
+	recordService       *service.OperationRecordService
 }
 
-func (r *DictionaryDetailRouter) InitSysDictionaryDetailRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
-	dictionaryDetailRouter := router.Group("sysDictionaryDetail").Use(middleware.OperationRecord(recordService))
+func (r *DictionaryDetailRouter) InitSysDictionaryDetailRouter(router *gin.RouterGroup) {
+	dictionaryDetailRouter := router.Group("sysDictionaryDetail").Use(middleware.OperationRecord(r.recordService))
 	dictionaryDetailRouterWithoutRecord := router.Group("sysDictionaryDetail")
 	{
 		dictionaryDetailRouter.POST("createSysDictionaryDetail", r.dictionaryDetailApi.CreateSysDictionaryDetail)   // 新建SysDictionaryDetail

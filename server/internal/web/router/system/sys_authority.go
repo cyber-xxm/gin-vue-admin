@@ -7,18 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewAuthorityRouter(authorityApi *system.AuthorityApi) *AuthorityRouter {
+func NewAuthorityRouter(authorityApi *system.AuthorityApi, recordService *service.OperationRecordService) *AuthorityRouter {
 	return &AuthorityRouter{
-		authorityApi: authorityApi,
+		authorityApi:  authorityApi,
+		recordService: recordService,
 	}
 }
 
 type AuthorityRouter struct {
-	authorityApi *system.AuthorityApi
+	authorityApi  *system.AuthorityApi
+	recordService *service.OperationRecordService
 }
 
-func (r *AuthorityRouter) InitAuthorityRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
-	authorityRouter := router.Group("authority").Use(middleware.OperationRecord(recordService))
+func (r *AuthorityRouter) InitAuthorityRouter(router *gin.RouterGroup) {
+	authorityRouter := router.Group("authority").Use(middleware.OperationRecord(r.recordService))
 	authorityRouterWithoutRecord := router.Group("authority")
 	{
 		authorityRouter.POST("createAuthority", r.authorityApi.CreateAuthority)   // 创建角色

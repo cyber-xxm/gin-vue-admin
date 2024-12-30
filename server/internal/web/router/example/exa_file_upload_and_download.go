@@ -1,13 +1,22 @@
 package example
 
 import (
+	"github.com/cyber-xxm/gin-vue-admin/internal/web/api/example"
 	"github.com/gin-gonic/gin"
 )
 
-type FileUploadAndDownloadRouter struct{}
+func NewFileUploadAndDownload(exaFileUploadAndDownloadApi *example.FileUploadAndDownloadApi) *FileUploadAndDownloadRouter {
+	return &FileUploadAndDownloadRouter{
+		exaFileUploadAndDownloadApi: exaFileUploadAndDownloadApi,
+	}
+}
 
-func (r *FileUploadAndDownloadRouter) InitFileUploadAndDownloadRouter(Router *gin.RouterGroup) {
-	fileUploadAndDownloadRouter := Router.Group("fileUploadAndDownload")
+type FileUploadAndDownloadRouter struct {
+	exaFileUploadAndDownloadApi *example.FileUploadAndDownloadApi
+}
+
+func (r *FileUploadAndDownloadRouter) InitFileUploadAndDownloadRouter(router *gin.RouterGroup) {
+	fileUploadAndDownloadRouter := router.Group("fileUploadAndDownload")
 	{
 		fileUploadAndDownloadRouter.POST("upload", r.exaFileUploadAndDownloadApi.UploadFile)                                 // 上传文件
 		fileUploadAndDownloadRouter.POST("getFileList", r.exaFileUploadAndDownloadApi.GetFileList)                           // 获取上传文件列表

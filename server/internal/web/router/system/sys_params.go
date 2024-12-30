@@ -7,19 +7,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewSysParamsRouter(sysParamsApi *system.SysParamsApi) *SysParamsRouter {
+func NewSysParamsRouter(sysParamsApi *system.SysParamsApi, recordService *service.OperationRecordService) *SysParamsRouter {
 	return &SysParamsRouter{
-		sysParamsApi: sysParamsApi,
+		sysParamsApi:  sysParamsApi,
+		recordService: recordService,
 	}
 }
 
 type SysParamsRouter struct {
-	sysParamsApi *system.SysParamsApi
+	sysParamsApi  *system.SysParamsApi
+	recordService *service.OperationRecordService
 }
 
 // InitSysParamsRouter 初始化 参数 路由信息
-func (r *SysParamsRouter) InitSysParamsRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
-	sysParamsRouter := router.Group("sysParams").Use(middleware.OperationRecord(recordService))
+func (r *SysParamsRouter) InitSysParamsRouter(router *gin.RouterGroup) {
+	sysParamsRouter := router.Group("sysParams").Use(middleware.OperationRecord(r.recordService))
 	sysParamsRouterWithoutRecord := router.Group("sysParams")
 	{
 		sysParamsRouter.POST("createSysParams", r.sysParamsApi.CreateSysParams)             // 新建参数

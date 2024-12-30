@@ -7,18 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewConfigRouter(configApi *system.ConfigApi) *ConfigRouter {
+func NewConfigRouter(configApi *system.ConfigApi, recordService *service.OperationRecordService) *ConfigRouter {
 	return &ConfigRouter{
-		configApi: configApi,
+		configApi:     configApi,
+		recordService: recordService,
 	}
 }
 
 type ConfigRouter struct {
-	configApi *system.ConfigApi
+	configApi     *system.ConfigApi
+	recordService *service.OperationRecordService
 }
 
-func (r *ConfigRouter) InitSystemRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
-	sysRouter := router.Group("system").Use(middleware.OperationRecord(recordService))
+func (r *ConfigRouter) InitSystemRouter(router *gin.RouterGroup) {
+	sysRouter := router.Group("system").Use(middleware.OperationRecord(r.recordService))
 	sysRouterWithoutRecord := router.Group("system")
 
 	{

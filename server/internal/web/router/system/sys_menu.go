@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewMenuRouter(authorityMenuApi *system.MenuApi) *MenuRouter {
+func NewMenuRouter(authorityMenuApi *system.MenuApi, recordService *service.OperationRecordService) *MenuRouter {
 	return &MenuRouter{
 		authorityMenuApi: authorityMenuApi,
 	}
@@ -15,10 +15,11 @@ func NewMenuRouter(authorityMenuApi *system.MenuApi) *MenuRouter {
 
 type MenuRouter struct {
 	authorityMenuApi *system.MenuApi
+	recordService    *service.OperationRecordService
 }
 
-func (r *MenuRouter) InitMenuRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) (R gin.IRoutes) {
-	menuRouter := router.Group("menu").Use(middleware.OperationRecord(recordService))
+func (r *MenuRouter) InitMenuRouter(router *gin.RouterGroup) (R gin.IRoutes) {
+	menuRouter := router.Group("menu").Use(middleware.OperationRecord(r.recordService))
 	menuRouterWithoutRecord := router.Group("menu")
 	{
 		menuRouter.POST("addBaseMenu", r.authorityMenuApi.AddBaseMenu)           // 新增菜单

@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewSysExportTemplateRouter(exportTemplateApi *system.SysExportTemplateApi) *SysExportTemplateRouter {
+func NewSysExportTemplateRouter(exportTemplateApi *system.SysExportTemplateApi, recordService *service.OperationRecordService) *SysExportTemplateRouter {
 	return &SysExportTemplateRouter{
 		exportTemplateApi: exportTemplateApi,
 	}
@@ -15,11 +15,12 @@ func NewSysExportTemplateRouter(exportTemplateApi *system.SysExportTemplateApi) 
 
 type SysExportTemplateRouter struct {
 	exportTemplateApi *system.SysExportTemplateApi
+	recordService     *service.OperationRecordService
 }
 
 // InitSysExportTemplateRouter 初始化 导出模板 路由信息
-func (r *SysExportTemplateRouter) InitSysExportTemplateRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
-	sysExportTemplateRouter := router.Group("sysExportTemplate").Use(middleware.OperationRecord(recordService))
+func (r *SysExportTemplateRouter) InitSysExportTemplateRouter(router *gin.RouterGroup) {
+	sysExportTemplateRouter := router.Group("sysExportTemplate").Use(middleware.OperationRecord(r.recordService))
 	sysExportTemplateRouterWithoutRecord := router.Group("sysExportTemplate")
 	{
 		sysExportTemplateRouter.POST("createSysExportTemplate", r.exportTemplateApi.CreateSysExportTemplate)             // 新建导出模板

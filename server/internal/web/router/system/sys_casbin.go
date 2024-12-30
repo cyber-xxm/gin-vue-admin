@@ -7,18 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewCasbinRouter(casbinApi *system.CasbinApi) *CasbinRouter {
+func NewCasbinRouter(casbinApi *system.CasbinApi, recordService *service.OperationRecordService) *CasbinRouter {
 	return &CasbinRouter{
 		casbinApi: casbinApi,
 	}
 }
 
 type CasbinRouter struct {
-	casbinApi *system.CasbinApi
+	casbinApi     *system.CasbinApi
+	recordService *service.OperationRecordService
 }
 
-func (r *CasbinRouter) InitCasbinRouter(router *gin.RouterGroup, recordService *service.OperationRecordService) {
-	casbinRouter := router.Group("casbin").Use(middleware.OperationRecord(recordService))
+func (r *CasbinRouter) InitCasbinRouter(router *gin.RouterGroup) {
+	casbinRouter := router.Group("casbin").Use(middleware.OperationRecord(r.recordService))
 	casbinRouterWithoutRecord := router.Group("casbin")
 	{
 		casbinRouter.POST("updateCasbin", r.casbinApi.UpdateCasbin)
